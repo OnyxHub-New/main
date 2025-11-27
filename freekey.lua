@@ -1,1 +1,1 @@
-return {"OBL-6uH8yyYJVykMveZS"}
+OBL-6uH8yyYJVykMveZS
