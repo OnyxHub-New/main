@@ -3084,12 +3084,30 @@ function library:LoadConfig(name)
         if file then
             self.current_config = name
             local config = services.HttpService:JSONDecode(file)
-
+            local oldCallbacks = {}
+            for flag, object in next, self.config_objects do
+                if object.callback then
+                    oldCallbacks[flag] = object.callback
+                    object.callback = function() end 
+                end
+            end
             for flag, value in next, config do
                 local object = self.config_objects[flag]
-
                 if object then
                     object:Set(value)
+                end
+            end
+            for flag, callback in next, oldCallbacks do
+                local object = self.config_objects[flag]
+                if object and callback then
+                    object.callback = callback
+                    if object.toggled ~= nil then
+                        callback(object.toggled)
+                    elseif object.current_value ~= nil then
+                        callback(object.current_value)
+                    elseif self.flags[flag] ~= nil then
+                        callback(self.flags[flag])
+                    end
                 end
             end
 
