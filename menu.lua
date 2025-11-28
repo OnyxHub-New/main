@@ -3080,39 +3080,24 @@ end
 function library:LoadConfig(name)
     if typeof(name) == "string" then
         local file = self:GetFile("configs", name, self.extension)
-
         if file then
             self.current_config = name
             local config = services.HttpService:JSONDecode(file)
-            local oldCallbacks = {}
-            for flag, object in next, self.config_objects do
-                if object.callback then
-                    oldCallbacks[flag] = object.callback
-                    object.callback = function() end 
-                end
-            end
+            local flagsToCall = {}
             for flag, value in next, config do
                 local object = self.config_objects[flag]
                 if object then
                     object:Set(value)
+                    flagsToCall[flag] = value
                 end
             end
-            for flag, callback in next, oldCallbacks do
+            for flag, value in next, flagsToCall do
                 local object = self.config_objects[flag]
-                if object and callback then
-                    object.callback = callback
-                    if object.toggled ~= nil then
-                        callback(object.toggled)
-                    elseif object.current_value ~= nil then
-                        callback(object.current_value)
-                    elseif self.flags[flag] ~= nil then
-                        callback(self.flags[flag])
-                    end
+                if object and object.callback then
+                    object.callback(value)
                 end
             end
-
             library:LoadTheme(self.flags["selected_theme"]);
-
             if (self.theme_colorpickers) then
                 for option, colorpicker in next, self.theme_colorpickers do
                     colorpicker:Set(self.theme[option])
