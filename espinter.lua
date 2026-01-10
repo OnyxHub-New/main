@@ -778,9 +778,7 @@ function EspInterface.getArmor(player)
         local bodyEffects = character:FindFirstChild("BodyEffects");
         if bodyEffects then
             local armor = bodyEffects:FindFirstChild("Armor");
-            if armor and armor:IsA("NumberValue") then
-                return armor.Value;
-            end
+            return armor.Value;
         end
     end
     return 0;
