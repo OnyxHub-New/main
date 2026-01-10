@@ -43,9 +43,6 @@ local HEALTH_TEXT_OFFSET = Vector2.new(3, 0);
 local HEALTH_BAR_OUTLINE_OFFSET = Vector2.new(0, 1);
 local NAME_OFFSET = Vector2.new(0, 2);
 local DISTANCE_OFFSET = Vector2.new(0, 2);
-local ARMOR_BAR_OFFSET = Vector2.new(-5, 0);
-local ARMOR_TEXT_OFFSET = Vector2.new(-3, 0);
-local ARMOR_BAR_OUTLINE_OFFSET = Vector2.new(0, 1);
 local VERTICES = {
 	Vector3.new(-1, -1, -1),
 	Vector3.new(-1, 1, -1),
@@ -173,9 +170,6 @@ function EspObject:Construct()
 			name = self:_create("Text", { Text = self.player.DisplayName, Center = true, Visible = false }),
 			distance = self:_create("Text", { Center = true, Visible = false }),
 			weapon = self:_create("Text", { Center = true, Visible = false }),
-            armorBarOutline = self:_create("Line", { Thickness = 3, Visible = false }),
-            armorBar = self:_create("Line", { Thickness = 1, Visible = false }),
-            armorText = self:_create("Text", { Center = true, Visible = false }),
 		},
 		hidden = {
 			arrowOutline = self:_create("Triangle", { Thickness = 3, Visible = false }),
@@ -318,41 +312,6 @@ function EspObject:Render()
 		healthText.OutlineColor = parseColor(self, options.healthTextOutlineColor, true);
 		healthText.Position = lerp2(barTo, barFrom, self.health/self.maxHealth) - healthText.TextBounds*0.5 - HEALTH_TEXT_OFFSET;
 	end
-    visible.armorBar.Visible = enabled and onScreen and options.armorBar;
-    visible.armorBarOutline.Visible = visible.armorBar.Visible and options.armorBarOutline;
-    if visible.armorBar.Visible then
-        local barFrom = corners.topRight + ARMOR_BAR_OFFSET;
-        local barTo = corners.bottomRight + ARMOR_BAR_OFFSET;
-        local maxArmor = 200;
-
-        local armorBar = visible.armorBar;
-        armorBar.To = barTo;
-        armorBar.From = lerp2(barTo, barFrom, self.armor/maxArmor);
-        armorBar.Color = options.armorBarColor[1];
-
-        local armorBarOutline = visible.armorBarOutline;
-        armorBarOutline.To = barTo + ARMOR_BAR_OUTLINE_OFFSET;
-        armorBarOutline.From = barFrom - ARMOR_BAR_OUTLINE_OFFSET;
-        armorBarOutline.Color = parseColor(self, options.armorBarOutlineColor[1], true);
-        armorBarOutline.Transparency = options.armorBarOutlineColor[2];
-    end
-
-    visible.armorText.Visible = enabled and onScreen and options.armorText;
-    if visible.armorText.Visible then
-        local barFrom = corners.topRight + ARMOR_BAR_OFFSET;
-        local barTo = corners.bottomRight + ARMOR_BAR_OFFSET;
-        local maxArmor = 200;
-
-        local armorText = visible.armorText;
-        armorText.Text = round(self.armor) .. "ap";
-        armorText.Size = interface.sharedSettings.textSize;
-        armorText.Font = interface.sharedSettings.textFont;
-        armorText.Color = parseColor(self, options.armorTextColor[1]);
-        armorText.Transparency = options.armorTextColor[2];
-        armorText.Outline = options.armorTextOutline;
-        armorText.OutlineColor = parseColor(self, options.armorTextOutlineColor, true);
-        armorText.Position = lerp2(barTo, barFrom, self.armor/maxArmor) - armorText.TextBounds*0.5 - ARMOR_TEXT_OFFSET;
-    end
 	visible.name.Visible = enabled and onScreen and options.name;
 	if visible.name.Visible then
 		local name = visible.name;
@@ -603,14 +562,7 @@ local EspInterface = {
 			healthTextColor = { Color3.new(1,1,1), 1 },
 			healthTextOutline = true,
 			healthTextOutlineColor = Color3.new(),
-            armorBar = false,
-            armorBarColor = { Color3.fromRGB(0, 150, 255), 1 },
-            armorBarOutline = true,
-            armorBarOutlineColor = { Color3.new(), 0.5 },
-            armorText = false,
-            armorTextColor = { Color3.fromRGB(0, 150, 255), 1 },
-            armorTextOutline = true,
-            armorTextOutlineColor = Color3.new(),
+            
 			box3d = false,
 			box3dColor = { Color3.new(1,0,0), 1 },
 			name = false,
@@ -771,16 +723,5 @@ function EspInterface.getHealth(player)
 		return humanoid.Health, humanoid.MaxHealth;
 	end
 	return 100, 100;
-end
-function EspInterface.getArmor(player)
-    local character = player and EspInterface.getCharacter(player);
-    if character then
-        local bodyEffects = character:FindFirstChild("BodyEffects");
-        if bodyEffects then
-            local armor = bodyEffects:FindFirstChild("Armor");
-            return armor.Value;
-        end
-    end
-    return 0;
 end
 return EspInterface;
