@@ -177,51 +177,61 @@ function Esp:Dest()
 	cl(self)
 end
 function Esp:Upd()
-	local itf = self.itf
-	self.opt = itf.tSet[itf.isFr(self.plr) and "fr" or "en"]
-	self.char = itf.getChar(self.plr)
-	self.hp, self.maxHp = itf.getHp(self.plr)
-	self.arm = itf.getArm(self.plr)
-	self.wep = itf.getWep(self.plr)
-	
-	self.en = self.opt.en and self.char and self.plr and self.plr.UserId and not
-		(#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
+    local itf = self.itf
+    self.opt = itf.tSet[itf.isFr(self.plr) and "fr" or "en"]
+    if not self.plr or not self.plr.Parent then
+        self.en = false
+        self.char = nil
+        self.onSc = false
+        return
+    end
+    
+    self.char = itf.getChar(self.plr)
+    self.hp, self.maxHp = itf.getHp(self.plr)
+    self.arm = itf.getArm(self.plr)
+    self.wep = itf.getWep(self.plr)
+    local hasUserId = pcall(function() 
+        return self.plr.UserId ~= nil
+    end)
+    
+    self.en = self.opt.en and self.char and self.plr ~= lp and hasUserId and not
+        (#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
 
-	local hd = self.en and fc(self.char, "Head")
-	if not hd then
-		self.charCache = {}
-		self.onSc = false
-		return
-	end
+    local hd = self.en and fc(self.char, "Head")
+    if not hd then
+        self.charCache = {}
+        self.onSc = false
+        return
+    end
 
-	local _, onSc, dep = w2sc(hd.Position)
-	self.onSc = onSc
-	self.dis = dep
+    local _, onSc, dep = w2sc(hd.Position)
+    self.onSc = onSc
+    self.dis = dep
 
-	if itf.shSet.limDis and dep > itf.shSet.maxDis then
-		self.onSc = false
-	end
+    if itf.shSet.limDis and dep > itf.shSet.maxDis then
+        self.onSc = false
+    end
 
-	if self.onSc then
-		local ch = self.charCache
-		local kids = gc(self.char)
-		if not ch[1] or self.childCnt ~= #kids then
-			cl(ch)
-			for i = 1, #kids do
-				local p = kids[i]
-				if isA(p, "BasePart") and isBP(p.Name) then
-					ch[#ch + 1] = p
-				end
-			end
-			self.childCnt = #kids
-		end
-		self.corn = calcCorn(getBB(ch))
-	elseif self.opt.offAr then
-		local cf = cam.CFrame
-		local flt = fm(cf.Position, cf.RightVector, Vector3.yAxis)
-		local obj = pos(flt, hd.Position)
-		self.dir = Vector2.new(obj.X, obj.Z).Unit
-	end
+    if self.onSc then
+        local ch = self.charCache
+        local kids = gc(self.char)
+        if not ch[1] or self.childCnt ~= #kids then
+            cl(ch)
+            for i = 1, #kids do
+                local p = kids[i]
+                if isA(p, "BasePart") and isBP(p.Name) then
+                    ch[#ch + 1] = p
+                end
+            end
+            self.childCnt = #kids
+        end
+        self.corn = calcCorn(getBB(ch))
+    elseif self.opt.offAr then
+        local cf = cam.CFrame
+        local flt = fm(cf.Position, cf.RightVector, Vector3.yAxis)
+        local obj = pos(flt, hd.Position)
+        self.dir = Vector2.new(obj.X, obj.Z).Unit
+    end
 end
 function Esp:Ren()
 	local onSc = self.onSc or false
@@ -454,24 +464,32 @@ function Cham:Dest()
 end
 
 function Cham:Upd()
-	local hl = self.hl
-	local itf = self.itf
-	local char = itf.getChar(self.plr)
-	local opt = itf.tSet[itf.isFr(self.plr) and "fr" or "en"]
-	local en = opt.en and char and self.plr and self.plr.UserId and not
-		(#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
+    local hl = self.hl
+    local itf = self.itf
+    if not self.plr or not self.plr.Parent then
+        hl.Enabled = false
+        return
+    end
+    
+    local char = itf.getChar(self.plr)
+    local opt = itf.tSet[itf.isFr(self.plr) and "fr" or "en"]
+    local hasUserId = pcall(function() 
+        return self.plr.UserId ~= nil
+    end)
+    
+    local en = opt.en and char and self.plr ~= lp and hasUserId and not
+        (#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
 
-	hl.Enabled = en and opt.chams
-	if hl.Enabled then
-		hl.Adornee = char
-		hl.FillColor = parseC(self, opt.chamsFCol[1])
-		hl.FillTransparency = opt.chamsFCol[2]
-		hl.OutlineColor = parseC(self, opt.chamsOCol[1], true)
-		hl.OutlineTransparency = opt.chamsOCol[2]
-		hl.DepthMode = opt.chamsVisOnly and "Occluded" or "AlwaysOnTop"
-	end
+    hl.Enabled = en and opt.chams
+    if hl.Enabled then
+        hl.Adornee = char
+        hl.FillColor = parseC(self, opt.chamsFCol[1])
+        hl.FillTransparency = opt.chamsFCol[2]
+        hl.OutlineColor = parseC(self, opt.chamsOCol[1], true)
+        hl.OutlineTransparency = opt.chamsOCol[2]
+        hl.DepthMode = opt.chamsVisOnly and "Occluded" or "AlwaysOnTop"
+    end
 end
-
 local Inst = {}
 Inst.__index = Inst
 
