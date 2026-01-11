@@ -37,8 +37,8 @@ local HT_OFF = Vector2.new(3, 0)
 local HO_OFF = Vector2.new(0, 1)
 local N_OFF = Vector2.new(0, 2)
 local D_OFF = Vector2.new(0, 2)
-local AB_OFF = Vector2.new(7, 0)
-local AT_OFF = Vector2.new(10, 0)
+local AB_OFF = Vector2.new(8, 0) 
+local AT_OFF = Vector2.new(12, 0)
 local AO_OFF = Vector2.new(0, 1)
 local VERTS = {
 	Vector3.new(-1, -1, -1),
@@ -193,9 +193,12 @@ function Esp:Upd()
     local hasUserId = pcall(function() 
         return self.plr.UserId ~= nil
     end)
-    
-    self.en = self.opt.en and self.char and hasUserId and not
-        (#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
+    if self.plr == lp and not self.itf.allowlocal then
+        self.en = false
+    else
+        self.en = self.opt.en and self.char and hasUserId and not
+            (#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
+    end
 
     local hd = self.en and fc(self.char, "Head")
     if not hd then
@@ -462,7 +465,6 @@ function Cham:Dest()
 	self.hl:Destroy()
 	cl(self)
 end
-
 function Cham:Upd()
     local hl = self.hl
     local itf = self.itf
@@ -476,9 +478,13 @@ function Cham:Upd()
     local hasUserId = pcall(function() 
         return self.plr.UserId ~= nil
     end)
-    
-    local en = opt.en and char and hasUserId and not
-        (#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
+    local en
+    if self.plr == lp and not self.itf.allowlocal then
+        en = false
+    else
+        en = opt.en and char and hasUserId and not
+            (#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
+    end
 
     hl.Enabled = en and opt.chams
     if hl.Enabled then
@@ -572,6 +578,7 @@ local Itf = {
 		maxDis = 150,
 		useTeam = false
 	},
+	allowlocal = false,
 	tSet = {
 		en = {
 			en = false,
