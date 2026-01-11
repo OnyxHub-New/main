@@ -153,6 +153,7 @@ function Esp:init()
 			n = self:_c("Text", { Text = self.plr.DisplayName, Center = true, Visible = false }),
 			d = self:_c("Text", { Center = true, Visible = false }),
 			w = self:_c("Text", { Center = true, Visible = false }),
+			gb = self:_c("Quad", { Thickness = 1, Visible = false }),
 			abo = self:_c("Line", { Thickness = 3, Visible = false }),
 			ab = self:_c("Line", { Thickness = 1, Visible = false }),
 			at = self:_c("Text", { Center = true, Visible = false }),
@@ -378,7 +379,36 @@ function Esp:Ren()
 		w.OutlineColor = parseC(self, opt.wOCol, true)
 		w.Position = (corn.bl + corn.br)*0.5 + (v.d.Visible and D_OFF + Vector2.yAxis*v.d.TextBounds.Y or Vector2.zero)
 	end
-
+	v.gb.Visible = en and onSc and opt.gbox
+	if v.gb.Visible then
+		local gb = v.gb
+		gb.PointA = corn.tl
+		gb.PointB = corn.tr
+		gb.PointC = corn.br
+		gb.PointD = corn.bl
+		
+		local col1 = parseC(self, opt.gboxCol1[1])
+		local col2 = parseC(self, opt.gboxCol2[1])
+		local col3 = parseC(self, opt.gboxCol3[1])
+		local col4 = parseC(self, opt.gboxCol4[1])
+		
+		gb.Color = col1
+		gb.Transparency = opt.gboxCol1[2]
+		
+		local pA, pB, pC, pD = gb.PointA, gb.PointB, gb.PointC, gb.PointD
+		
+		local function setVertex(i, col, trans)
+			if i == 1 then gb.PointA, gb.Color, gb.Transparency = pA, col, trans
+			elseif i == 2 then gb.PointB, gb.Color, gb.Transparency = pB, col, trans
+			elseif i == 3 then gb.PointC, gb.Color, gb.Transparency = pC, col, trans
+			elseif i == 4 then gb.PointD, gb.Color, gb.Transparency = pD, col, trans end
+		end
+		
+		setVertex(1, col1, opt.gboxCol1[2])
+		setVertex(2, col2, opt.gboxCol2[2])
+		setVertex(3, col3, opt.gboxCol3[2])
+		setVertex(4, col4, opt.gboxCol4[2])
+	end
 	v.tr.Visible = en and onSc and opt.tr
 	v.tro.Visible = v.tr.Visible and opt.tro
 	if v.tr.Visible then
@@ -630,6 +660,11 @@ local Itf = {
 			offArRad = 150,
 			offArO = true,
 			offArOCol = { Color3.new(), 1 },
+			gbox = false,
+			gboxCol1 = { Color3.new(1,0,0), 0.5 },
+			gboxCol2 = { Color3.new(0,1,0), 0.5 },
+			gboxCol3 = { Color3.new(0,0,1), 0.5 },
+			gboxCol4 = { Color3.new(1,1,0), 0.5 },
 			chams = false,
 			chamsVisOnly = false,
 			chamsFCol = { Color3.new(0.2, 0.2, 0.2), 0.5 },
@@ -678,6 +713,11 @@ local Itf = {
 			offArRad = 150,
 			offArO = true,
 			offArOCol = { Color3.new(), 1 },
+			gbox = false,
+			gboxCol1 = { Color3.new(0,1,0), 0.5 },
+			gboxCol2 = { Color3.new(1,0,0), 0.5 },
+			gboxCol3 = { Color3.new(1,1,0), 0.5 },
+			gboxCol4 = { Color3.new(0,0,1), 0.5 },
 			chams = false,
 			chamsVisOnly = false,
 			chamsFCol = { Color3.new(0.2, 0.2, 0.2), 0.5 },
