@@ -176,7 +176,6 @@ function Esp:Dest()
 	end
 	cl(self)
 end
-
 function Esp:Upd()
 	local itf = self.itf
 	self.opt = itf.tSet[itf.isFr(self.plr) and "fr" or "en"]
@@ -184,7 +183,9 @@ function Esp:Upd()
 	self.hp, self.maxHp = itf.getHp(self.plr)
 	self.arm = itf.getArm(self.plr)
 	self.wep = itf.getWep(self.plr)
-	self.en = self.opt.en and self.char and not (#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
+	
+	self.en = self.opt.en and self.char and self.plr and self.plr.UserId and not
+		(#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
 
 	local hd = self.en and fc(self.char, "Head")
 	if not hd then
@@ -222,7 +223,6 @@ function Esp:Upd()
 		self.dir = Vector2.new(obj.X, obj.Z).Unit
 	end
 end
-
 function Esp:Ren()
 	local onSc = self.onSc or false
 	local en = self.en or false
@@ -458,7 +458,8 @@ function Cham:Upd()
 	local itf = self.itf
 	local char = itf.getChar(self.plr)
 	local opt = itf.tSet[itf.isFr(self.plr) and "fr" or "en"]
-	local en = opt.en and char and not (#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
+	local en = opt.en and char and self.plr and self.plr.UserId and not
+		(#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
 
 	hl.Enabled = en and opt.chams
 	if hl.Enabled then
