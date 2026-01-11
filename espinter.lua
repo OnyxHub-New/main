@@ -106,11 +106,11 @@ local Esp = {}
 Esp.__index = Esp
 
 function Esp.new(p, itf)
-	local s = setmetatable({}, Esp)
-	s.plr = assert(p, "No player")
-	s.itf = assert(itf, "No interface")
-	s:init()
-	return s
+	local self = setmetatable({}, Esp)
+	self.plr = assert(p, "No player")
+	self.itf = assert(itf, "No interface")
+	self:init()
+	return self
 end
 
 function Esp:_c(cls, props)
@@ -118,93 +118,93 @@ function Esp:_c(cls, props)
 	for prop, val in next, props do
 		pcall(function() d[prop] = val end)
 	end
-	s.bin[#s.bin + 1] = d
+	self.bin[#self.bin + 1] = d
 	return d
 end
 
 function Esp:init()
-	s.charCache = {}
-	s.childCnt = 0
-	s.bin = {}
-	s.draw = {
+	self.charCache = {}
+	self.childCnt = 0
+	self.bin = {}
+	self.draw = {
 		b3d = {
-			{ s:_c("Line", { Thick = 1, Vis = false }),
-			  s:_c("Line", { Thick = 1, Vis = false }),
-			  s:_c("Line", { Thick = 1, Vis = false }) },
-			{ s:_c("Line", { Thick = 1, Vis = false }),
-			  s:_c("Line", { Thick = 1, Vis = false }),
-			  s:_c("Line", { Thick = 1, Vis = false }) },
-			{ s:_c("Line", { Thick = 1, Vis = false }),
-			  s:_c("Line", { Thick = 1, Vis = false }),
-			  s:_c("Line", { Thick = 1, Vis = false }) },
-			{ s:_c("Line", { Thick = 1, Vis = false }),
-			  s:_c("Line", { Thick = 1, Vis = false }),
-			  s:_c("Line", { Thick = 1, Vis = false }) }
+			{ self:_c("Line", { Thickness = 1, Visible = false }),
+			  self:_c("Line", { Thickness = 1, Visible = false }),
+			  self:_c("Line", { Thickness = 1, Visible = false }) },
+			{ self:_c("Line", { Thickness = 1, Visible = false }),
+			  self:_c("Line", { Thickness = 1, Visible = false }),
+			  self:_c("Line", { Thickness = 1, Visible = false }) },
+			{ self:_c("Line", { Thickness = 1, Visible = false }),
+			  self:_c("Line", { Thickness = 1, Visible = false }),
+			  self:_c("Line", { Thickness = 1, Visible = false }) },
+			{ self:_c("Line", { Thickness = 1, Visible = false }),
+			  self:_c("Line", { Thickness = 1, Visible = false }),
+			  self:_c("Line", { Thickness = 1, Visible = false }) }
 		},
 		v = {
-			tro = s:_c("Line", { Thick = 3, Vis = false }),
-			tr = s:_c("Line", { Thick = 1, Vis = false }),
-			bf = s:_c("Square", { Fill = true, Vis = false }),
-			bo = s:_c("Square", { Thick = 3, Vis = false }),
-			b = s:_c("Square", { Thick = 1, Vis = false }),
-			hbo = s:_c("Line", { Thick = 3, Vis = false }),
-			hb = s:_c("Line", { Thick = 1, Vis = false }),
-			ht = s:_c("Text", { Center = true, Vis = false }),
-			n = s:_c("Text", { Text = s.plr.DisplayName, Center = true, Vis = false }),
-			d = s:_c("Text", { Center = true, Vis = false }),
-			w = s:_c("Text", { Center = true, Vis = false }),
-			abo = s:_c("Line", { Thick = 3, Vis = false }),
-			ab = s:_c("Line", { Thick = 1, Vis = false }),
-			at = s:_c("Text", { Center = true, Vis = false }),
+			tro = self:_c("Line", { Thickness = 3, Visible = false }),
+			tr = self:_c("Line", { Thickness = 1, Visible = false }),
+			bf = self:_c("Square", { Filled = true, Visible = false }),
+			bo = self:_c("Square", { Thickness = 3, Visible = false }),
+			b = self:_c("Square", { Thickness = 1, Visible = false }),
+			hbo = self:_c("Line", { Thickness = 3, Visible = false }),
+			hb = self:_c("Line", { Thickness = 1, Visible = false }),
+			ht = self:_c("Text", { Center = true, Visible = false }),
+			n = self:_c("Text", { Text = self.plr.DisplayName, Center = true, Visible = false }),
+			d = self:_c("Text", { Center = true, Visible = false }),
+			w = self:_c("Text", { Center = true, Visible = false }),
+			abo = self:_c("Line", { Thickness = 3, Visible = false }),
+			ab = self:_c("Line", { Thickness = 1, Visible = false }),
+			at = self:_c("Text", { Center = true, Visible = false }),
 		},
 		h = {
-			aro = s:_c("Triangle", { Thick = 3, Vis = false }),
-			ar = s:_c("Triangle", { Fill = true, Vis = false })
+			aro = self:_c("Triangle", { Thickness = 3, Visible = false }),
+			ar = self:_c("Triangle", { Filled = true, Visible = false })
 		}
 	}
 
-	s.rendCon = run.Heartbeat:Connect(function(dt)
-		s:Upd(dt)
-		s:Ren(dt)
+	self.rendCon = run.Heartbeat:Connect(function(dt)
+		self:Upd(dt)
+		self:Ren(dt)
 	end)
 end
 
 function Esp:Dest()
-	s.rendCon:Disconnect()
-	for i = 1, #s.bin do
-		s.bin[i]:Remove()
+	self.rendCon:Disconnect()
+	for i = 1, #self.bin do
+		self.bin[i]:Remove()
 	end
-	cl(s)
+	cl(self)
 end
 
 function Esp:Upd()
-	local itf = s.itf
-	s.opt = itf.tSet[itf.isFr(s.plr) and "fr" or "en"]
-	s.char = itf.getChar(s.plr)
-	s.hp, s.maxHp = itf.getHp(s.plr)
-	s.arm = itf.getArm(s.plr)
-	s.wep = itf.getWep(s.plr)
-	s.en = s.opt.en and s.char and not (#itf.wlist > 0 and not fd(itf.wlist, s.plr.UserId))
+	local itf = self.itf
+	self.opt = itf.tSet[itf.isFr(self.plr) and "fr" or "en"]
+	self.char = itf.getChar(self.plr)
+	self.hp, self.maxHp = itf.getHp(self.plr)
+	self.arm = itf.getArm(self.plr)
+	self.wep = itf.getWep(self.plr)
+	self.en = self.opt.en and self.char and not (#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
 
-	local hd = s.en and fc(s.char, "Head")
+	local hd = self.en and fc(self.char, "Head")
 	if not hd then
-		s.charCache = {}
-		s.onSc = false
+		self.charCache = {}
+		self.onSc = false
 		return
 	end
 
 	local _, onSc, dep = w2sc(hd.Position)
-	s.onSc = onSc
-	s.dis = dep
+	self.onSc = onSc
+	self.dis = dep
 
 	if itf.shSet.limDis and dep > itf.shSet.maxDis then
-		s.onSc = false
+		self.onSc = false
 	end
 
-	if s.onSc then
-		local ch = s.charCache
-		local kids = gc(s.char)
-		if not ch[1] or s.childCnt ~= #kids then
+	if self.onSc then
+		local ch = self.charCache
+		local kids = gc(self.char)
+		if not ch[1] or self.childCnt ~= #kids then
 			cl(ch)
 			for i = 1, #kids do
 				local p = kids[i]
@@ -212,166 +212,166 @@ function Esp:Upd()
 					ch[#ch + 1] = p
 				end
 			end
-			s.childCnt = #kids
+			self.childCnt = #kids
 		end
-		s.corn = calcCorn(getBB(ch))
-	elseif s.opt.offAr then
+		self.corn = calcCorn(getBB(ch))
+	elseif self.opt.offAr then
 		local cf = cam.CFrame
 		local flt = fm(cf.Position, cf.RightVector, Vector3.yAxis)
 		local obj = pos(flt, hd.Position)
-		s.dir = Vector2.new(obj.X, obj.Z).Unit
+		self.dir = Vector2.new(obj.X, obj.Z).Unit
 	end
 end
 
 function Esp:Ren()
-	local onSc = s.onSc or false
-	local en = s.en or false
-	local v = s.draw.v
-	local h = s.draw.h
-	local b3d = s.draw.b3d
-	local itf = s.itf
-	local opt = s.opt
-	local corn = s.corn
+	local onSc = self.onSc or false
+	local en = self.en or false
+	local v = self.draw.v
+	local h = self.draw.h
+	local b3d = self.draw.b3d
+	local itf = self.itf
+	local opt = self.opt
+	local corn = self.corn
 
-	v.b.Vis = en and onSc and opt.box
-	v.bo.Vis = v.b.Vis and opt.boxO
-	if v.b.Vis then
+	v.b.Visible = en and onSc and opt.box
+	v.bo.Visible = v.b.Visible and opt.boxO
+	if v.b.Visible then
 		local b = v.b
-		b.Pos = corn.tl
+		b.Position = corn.tl
 		b.Size = corn.br - corn.tl
-		b.Col = parseC(s, opt.boxCol[1])
-		b.Trans = opt.boxCol[2]
+		b.Color = parseC(self, opt.boxCol[1])
+		b.Transparency = opt.boxCol[2]
 
 		local bo = v.bo
-		bo.Pos = b.Pos
+		bo.Position = b.Position
 		bo.Size = b.Size
-		bo.Col = parseC(s, opt.boxOCol[1], true)
-		bo.Trans = opt.boxOCol[2]
+		bo.Color = parseC(self, opt.boxOCol[1], true)
+		bo.Transparency = opt.boxOCol[2]
 	end
 
-	v.bf.Vis = en and onSc and opt.boxF
-	if v.bf.Vis then
+	v.bf.Visible = en and onSc and opt.boxF
+	if v.bf.Visible then
 		local bf = v.bf
-		bf.Pos = corn.tl
+		bf.Position = corn.tl
 		bf.Size = corn.br - corn.tl
-		bf.Col = parseC(s, opt.boxFCol[1])
-		bf.Trans = opt.boxFCol[2]
+		bf.Color = parseC(self, opt.boxFCol[1])
+		bf.Transparency = opt.boxFCol[2]
 	end
 
-	v.hb.Vis = en and onSc and opt.hb
-	v.hbo.Vis = v.hb.Vis and opt.hbo
-	if v.hb.Vis then
+	v.hb.Visible = en and onSc and opt.hb
+	v.hbo.Visible = v.hb.Visible and opt.hbo
+	if v.hb.Visible then
 		local fr = corn.tl - HB_OFF
 		local to = corn.bl - HB_OFF
 
 		local hb = v.hb
 		hb.To = to
-		hb.From = l2(to, fr, s.hp/s.maxHp)
-		hb.Col = lc(opt.dyCol, opt.hlCol, s.hp/s.maxHp)
+		hb.From = l2(to, fr, self.hp/self.maxHp)
+		hb.Color = lc(opt.dyCol, opt.hlCol, self.hp/self.maxHp)
 
 		local hbo = v.hbo
 		hbo.To = to + HO_OFF
 		hbo.From = fr - HO_OFF
-		hbo.Col = parseC(s, opt.hboCol[1], true)
-		hbo.Trans = opt.hboCol[2]
+		hbo.Color = parseC(self, opt.hboCol[1], true)
+		hbo.Transparency = opt.hboCol[2]
 	end
 
-	v.ht.Vis = en and onSc and opt.ht
-	if v.ht.Vis then
+	v.ht.Visible = en and onSc and opt.ht
+	if v.ht.Visible then
 		local fr = corn.tl - HB_OFF
 		local to = corn.bl - HB_OFF
 
 		local ht = v.ht
-		ht.Text = rd(s.hp) .. "hp"
+		ht.Text = rd(self.hp) .. "hp"
 		ht.Size = itf.shSet.tSz
 		ht.Font = itf.shSet.tFnt
-		ht.Col = parseC(s, opt.htCol[1])
-		ht.Trans = opt.htCol[2]
-		ht.Out = opt.htOut
-		ht.OutCol = parseC(s, opt.htOCol, true)
-		ht.Pos = l2(to, fr, s.hp/s.maxHp) - ht.TextBounds*0.5 - HT_OFF
+		ht.Color = parseC(self, opt.htCol[1])
+		ht.Transparency = opt.htCol[2]
+		ht.Outline = opt.htOut
+		ht.OutlineColor = parseC(self, opt.htOCol, true)
+		ht.Position = l2(to, fr, self.hp/self.maxHp) - ht.TextBounds*0.5 - HT_OFF
 	end
 
-	v.ab.Vis = en and onSc and opt.ab
-	v.abo.Vis = v.ab.Vis and opt.abo
-	if v.ab.Vis then
+	v.ab.Visible = en and onSc and opt.ab
+	v.abo.Visible = v.ab.Visible and opt.abo
+	if v.ab.Visible then
 		local fr = corn.tr + AB_OFF
 		local to = corn.br + AB_OFF
 		local maxArm = 200
 
 		local ab = v.ab
 		ab.To = to
-		ab.From = l2(to, fr, s.arm/maxArm)
-		ab.Col = opt.abCol[1]
+		ab.From = l2(to, fr, self.arm/maxArm)
+		ab.Color = opt.abCol[1]
 
 		local abo = v.abo
 		abo.To = to + AO_OFF
 		abo.From = fr - AO_OFF
-		abo.Col = parseC(s, opt.aboCol[1], true)
-		abo.Trans = opt.aboCol[2]
+		abo.Color = parseC(self, opt.aboCol[1], true)
+		abo.Transparency = opt.aboCol[2]
 	end
 
-	v.at.Vis = en and onSc and opt.at
-	if v.at.Vis then
+	v.at.Visible = en and onSc and opt.at
+	if v.at.Visible then
 		local fr = corn.tr + AB_OFF
 		local to = corn.br + AB_OFF
 		local maxArm = 200
 
 		local at = v.at
-		at.Text = rd(s.arm) .. "ap"
+		at.Text = rd(self.arm) .. "ap"
 		at.Size = itf.shSet.tSz
 		at.Font = itf.shSet.tFnt
-		at.Col = parseC(s, opt.atCol[1])
-		at.Trans = opt.atCol[2]
-		at.Out = opt.atOut
-		at.OutCol = parseC(s, opt.atOCol, true)
-		at.Pos = l2(to, fr, s.arm/maxArm) - at.TextBounds*0.5 + AT_OFF
+		at.Color = parseC(self, opt.atCol[1])
+		at.Transparency = opt.atCol[2]
+		at.Outline = opt.atOut
+		at.OutlineColor = parseC(self, opt.atOCol, true)
+		at.Position = l2(to, fr, self.arm/maxArm) - at.TextBounds*0.5 + AT_OFF
 	end
 
-	v.n.Vis = en and onSc and opt.name
-	if v.n.Vis then
+	v.n.Visible = en and onSc and opt.name
+	if v.n.Visible then
 		local n = v.n
 		n.Size = itf.shSet.tSz
 		n.Font = itf.shSet.tFnt
-		n.Col = parseC(s, opt.nCol[1])
-		n.Trans = opt.nCol[2]
-		n.Out = opt.nOut
-		n.OutCol = parseC(s, opt.nOCol, true)
-		n.Pos = (corn.tl + corn.tr)*0.5 - Vector2.yAxis*n.TextBounds.Y - N_OFF
+		n.Color = parseC(self, opt.nCol[1])
+		n.Transparency = opt.nCol[2]
+		n.Outline = opt.nOut
+		n.OutlineColor = parseC(self, opt.nOCol, true)
+		n.Position = (corn.tl + corn.tr)*0.5 - Vector2.yAxis*n.TextBounds.Y - N_OFF
 	end
 
-	v.d.Vis = en and onSc and s.dis and opt.dis
-	if v.d.Vis then
+	v.d.Visible = en and onSc and self.dis and opt.dis
+	if v.d.Visible then
 		local d = v.d
-		d.Text = rd(s.dis) .. " studs"
+		d.Text = rd(self.dis) .. " studs"
 		d.Size = itf.shSet.tSz
 		d.Font = itf.shSet.tFnt
-		d.Col = parseC(s, opt.dCol[1])
-		d.Trans = opt.dCol[2]
-		d.Out = opt.dOut
-		d.OutCol = parseC(s, opt.dOCol, true)
-		d.Pos = (corn.bl + corn.br)*0.5 + D_OFF
+		d.Color = parseC(self, opt.dCol[1])
+		d.Transparency = opt.dCol[2]
+		d.Outline = opt.dOut
+		d.OutlineColor = parseC(self, opt.dOCol, true)
+		d.Position = (corn.bl + corn.br)*0.5 + D_OFF
 	end
 
-	v.w.Vis = en and onSc and opt.wep
-	if v.w.Vis then
+	v.w.Visible = en and onSc and opt.wep
+	if v.w.Visible then
 		local w = v.w
-		w.Text = s.wep
+		w.Text = self.wep
 		w.Size = itf.shSet.tSz
 		w.Font = itf.shSet.tFnt
-		w.Col = parseC(s, opt.wCol[1])
-		w.Trans = opt.wCol[2]
-		w.Out = opt.wOut
-		w.OutCol = parseC(s, opt.wOCol, true)
-		w.Pos = (corn.bl + corn.br)*0.5 + (v.d.Vis and D_OFF + Vector2.yAxis*v.d.TextBounds.Y or Vector2.zero)
+		w.Color = parseC(self, opt.wCol[1])
+		w.Transparency = opt.wCol[2]
+		w.Outline = opt.wOut
+		w.OutlineColor = parseC(self, opt.wOCol, true)
+		w.Position = (corn.bl + corn.br)*0.5 + (v.d.Visible and D_OFF + Vector2.yAxis*v.d.TextBounds.Y or Vector2.zero)
 	end
 
-	v.tr.Vis = en and onSc and opt.tr
-	v.tro.Vis = v.tr.Vis and opt.tro
-	if v.tr.Vis then
+	v.tr.Visible = en and onSc and opt.tr
+	v.tro.Visible = v.tr.Visible and opt.tro
+	if v.tr.Visible then
 		local tr = v.tr
-		tr.Col = parseC(s, opt.trCol[1])
-		tr.Trans = opt.trCol[2]
+		tr.Color = parseC(self, opt.trCol[1])
+		tr.Transparency = opt.trCol[2]
 		tr.To = (corn.bl + corn.br)*0.5
 		tr.From =
 			opt.trOrg == "Middle" and vs*0.5 or
@@ -379,28 +379,28 @@ function Esp:Ren()
 			opt.trOrg == "Bottom" and vs*Vector2.new(0.5, 1)
 
 		local tro = v.tro
-		tro.Col = parseC(s, opt.troCol[1], true)
-		tro.Trans = opt.troCol[2]
+		tro.Color = parseC(self, opt.troCol[1], true)
+		tro.Transparency = opt.troCol[2]
 		tro.To = tr.To
 		tro.From = tr.From
 	end
 
-	h.ar.Vis = en and (not onSc) and opt.offAr
-	h.aro.Vis = h.ar.Vis and opt.offArO
-	if h.ar.Vis and s.dir then
+	h.ar.Visible = en and (not onSc) and opt.offAr
+	h.aro.Visible = h.ar.Visible and opt.offArO
+	if h.ar.Visible and self.dir then
 		local ar = h.ar
-		ar.PointA = m2(m2x(vs*0.5 + s.dir*opt.offArRad, Vector2.one*25), vs - Vector2.one*25)
-		ar.PointB = ar.PointA - rotV(s.dir, 0.45)*opt.offArSz
-		ar.PointC = ar.PointA - rotV(s.dir, -0.45)*opt.offArSz
-		ar.Col = parseC(s, opt.offArCol[1])
-		ar.Trans = opt.offArCol[2]
+		ar.PointA = m2(m2x(vs*0.5 + self.dir*opt.offArRad, Vector2.one*25), vs - Vector2.one*25)
+		ar.PointB = ar.PointA - rotV(self.dir, 0.45)*opt.offArSz
+		ar.PointC = ar.PointA - rotV(self.dir, -0.45)*opt.offArSz
+		ar.Color = parseC(self, opt.offArCol[1])
+		ar.Transparency = opt.offArCol[2]
 
 		local aro = h.aro
 		aro.PointA = ar.PointA
 		aro.PointB = ar.PointB
 		aro.PointC = ar.PointC
-		aro.Col = parseC(s, opt.offArOCol[1], true)
-		aro.Trans = opt.offArOCol[2]
+		aro.Color = parseC(self, opt.offArOCol[1], true)
+		aro.Transparency = opt.offArOCol[2]
 	end
 
 	local b3dEn = en and onSc and opt.b3d
@@ -408,9 +408,9 @@ function Esp:Ren()
 		local f = b3d[i]
 		for i2 = 1, #f do
 			local ln = f[i2]
-			ln.Vis = b3dEn
-			ln.Col = parseC(s, opt.b3dCol[1])
-			ln.Trans = opt.b3dCol[2]
+			ln.Visible = b3dEn
+			ln.Color = parseC(self, opt.b3dCol[1])
+			ln.Transparency = opt.b3dCol[2]
 		end
 
 		if b3dEn then
@@ -433,40 +433,40 @@ local Cham = {}
 Cham.__index = Cham
 
 function Cham.new(p, itf)
-	local s = setmetatable({}, Cham)
-	s.plr = assert(p, "No player")
-	s.itf = assert(itf, "No interface")
-	s:init()
-	return s
+	local self = setmetatable({}, Cham)
+	self.plr = assert(p, "No player")
+	self.itf = assert(itf, "No interface")
+	self:init()
+	return self
 end
 
 function Cham:init()
-	s.hl = Instance.new("Highlight", gui)
-	s.upCon = run.Heartbeat:Connect(function()
-		s:Upd()
+	self.hl = Instance.new("Highlight", gui)
+	self.upCon = run.Heartbeat:Connect(function()
+		self:Upd()
 	end)
 end
 
 function Cham:Dest()
-	s.upCon:Disconnect()
-	s.hl:Destroy()
-	cl(s)
+	self.upCon:Disconnect()
+	self.hl:Destroy()
+	cl(self)
 end
 
 function Cham:Upd()
-	local hl = s.hl
-	local itf = s.itf
-	local char = itf.getChar(s.plr)
-	local opt = itf.tSet[itf.isFr(s.plr) and "fr" or "en"]
-	local en = opt.en and char and not (#itf.wlist > 0 and not fd(itf.wlist, s.plr.UserId))
+	local hl = self.hl
+	local itf = self.itf
+	local char = itf.getChar(self.plr)
+	local opt = itf.tSet[itf.isFr(self.plr) and "fr" or "en"]
+	local en = opt.en and char and not (#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
 
 	hl.Enabled = en and opt.chams
 	if hl.Enabled then
 		hl.Adornee = char
-		hl.FillCol = parseC(s, opt.chamsFCol[1])
-		hl.FillTrans = opt.chamsFCol[2]
-		hl.OutCol = parseC(s, opt.chamsOCol[1], true)
-		hl.OutTrans = opt.chamsOCol[2]
+		hl.FillColor = parseC(self, opt.chamsFCol[1])
+		hl.FillTransparency = opt.chamsFCol[2]
+		hl.OutlineColor = parseC(self, opt.chamsOCol[1], true)
+		hl.OutlineTransparency = opt.chamsOCol[2]
 		hl.DepthMode = opt.chamsVisOnly and "Occluded" or "AlwaysOnTop"
 	end
 end
@@ -475,15 +475,15 @@ local Inst = {}
 Inst.__index = Inst
 
 function Inst.new(i, opt)
-	local s = setmetatable({}, Inst)
-	s.inst = assert(i, "No instance")
-	s.opt = assert(opt, "No options")
-	s:init()
-	return s
+	local self = setmetatable({}, Inst)
+	self.inst = assert(i, "No instance")
+	self.opt = assert(opt, "No options")
+	self:init()
+	return self
 end
 
 function Inst:init()
-	local opt = s.opt
+	local opt = self.opt
 	opt.en = opt.en == nil and true or opt.en
 	opt.txt = opt.txt or "{name}"
 	opt.txtCol = opt.txtCol or { Color3.new(1,1,1), 1 }
@@ -494,29 +494,29 @@ function Inst:init()
 	opt.limDis = opt.limDis or false
 	opt.maxDis = opt.maxDis or 150
 
-	s.txt = Drawing.new("Text")
-	s.txt.Center = true
+	self.txt = Drawing.new("Text")
+	self.txt.Center = true
 
-	s.rendCon = run.Heartbeat:Connect(function(dt)
-		s:Ren(dt)
+	self.rendCon = run.Heartbeat:Connect(function(dt)
+		self:Ren(dt)
 	end)
 end
 
 function Inst:Dest()
-	s.rendCon:Disconnect()
-	s.txt:Remove()
+	self.rendCon:Disconnect()
+	self.txt:Remove()
 end
 
 function Inst:Ren()
-	local inst = s.inst
+	local inst = self.inst
 	if not inst or not inst.Parent then
-		return s:Dest()
+		return self:Dest()
 	end
 
-	local txt = s.txt
-	local opt = s.opt
+	local txt = self.txt
+	local opt = self.opt
 	if not opt.en then
-		txt.Vis = false
+		txt.Visible = false
 		return
 	end
 
@@ -526,13 +526,13 @@ function Inst:Ren()
 		vis = false
 	end
 
-	txt.Vis = vis
-	if txt.Vis then
-		txt.Pos = pos
-		txt.Col = opt.txtCol[1]
-		txt.Trans = opt.txtCol[2]
-		txt.Out = opt.txtOut
-		txt.OutCol = opt.txtOCol
+	txt.Visible = vis
+	if txt.Visible then
+		txt.Position = pos
+		txt.Color = opt.txtCol[1]
+		txt.Transparency = opt.txtCol[2]
+		txt.Outline = opt.txtOut
+		txt.OutlineColor = opt.txtOCol
 		txt.Size = opt.txtSz
 		txt.Font = opt.txtFnt
 		txt.Text = opt.txt
@@ -691,7 +691,7 @@ function Itf.Load()
 	end
 
 	local ps = plrs:GetPlayers()
-	for i = 2, #ps do
+	for i = 1, #ps do
 		add(ps[i])
 	end
 
