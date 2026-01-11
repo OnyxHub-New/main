@@ -37,8 +37,8 @@ local HT_OFF = Vector2.new(3, 0)
 local HO_OFF = Vector2.new(0, 1)
 local N_OFF = Vector2.new(0, 2)
 local D_OFF = Vector2.new(0, 2)
-local AB_OFF = Vector2.new(5, 0)
-local AT_OFF = Vector2.new(3, 0)
+local AB_OFF = Vector2.new(7, 0)
+local AT_OFF = Vector2.new(10, 0)
 local AO_OFF = Vector2.new(0, 1)
 local VERTS = {
 	Vector3.new(-1, -1, -1),
@@ -194,7 +194,7 @@ function Esp:Upd()
         return self.plr.UserId ~= nil
     end)
     
-    self.en = self.opt.en and self.char and self.plr ~= lp and hasUserId and not
+    self.en = self.opt.en and self.char and hasUserId and not
         (#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
 
     local hd = self.en and fc(self.char, "Head")
@@ -477,7 +477,7 @@ function Cham:Upd()
         return self.plr.UserId ~= nil
     end)
     
-    local en = opt.en and char and self.plr ~= lp and hasUserId and not
+    local en = opt.en and char and hasUserId and not
         (#itf.wlist > 0 and not fd(itf.wlist, self.plr.UserId))
 
     hl.Enabled = en and opt.chams
@@ -595,7 +595,7 @@ local Itf = {
 			abo = true,
 			aboCol = { Color3.new(), 0.5 },
 			at = false,
-			atCol = { Color3.fromRGB(0, 150, 255), 1 },
+			atCol = { Color3.new(1,1,1), 1 },
 			atOut = true,
 			atOCol = Color3.new(),
 			b3d = false,
