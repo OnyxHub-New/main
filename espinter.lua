@@ -127,6 +127,28 @@ function Esp:init()
 	self.childCnt = 0
 	self.bin = {}
 	self.draw = {
+		skel = {
+			hd = self:_c("Line", { Thickness = 2, Visible = false }),
+			nt = self:_c("Line", { Thickness = 2, Visible = false }),
+			ls = self:_c("Line", { Thickness = 2, Visible = false }),
+			rs = self:_c("Line", { Thickness = 2, Visible = false }),
+			la = self:_c("Line", { Thickness = 2, Visible = false }),
+			ra = self:_c("Line", { Thickness = 2, Visible = false }),
+			ll = self:_c("Line", { Thickness = 2, Visible = false }),
+			rl = self:_c("Line", { Thickness = 2, Visible = false }),
+			bh = self:_c("Line", { Thickness = 2, Visible = false })
+		},
+		gskel = {
+			hd = self:_c("Line", { Thickness = 3, Visible = false }),
+			nt = self:_c("Line", { Thickness = 3, Visible = false }),
+			ls = self:_c("Line", { Thickness = 3, Visible = false }),
+			rs = self:_c("Line", { Thickness = 3, Visible = false }),
+			la = self:_c("Line", { Thickness = 3, Visible = false }),
+			ra = self:_c("Line", { Thickness = 3, Visible = false }),
+			ll = self:_c("Line", { Thickness = 3, Visible = false }),
+			rl = self:_c("Line", { Thickness = 3, Visible = false }),
+			bh = self:_c("Line", { Thickness = 3, Visible = false })
+		},
 		b3d = {
 			{ self:_c("Line", { Thickness = 1, Visible = false }),
 			  self:_c("Line", { Thickness = 1, Visible = false }),
@@ -217,6 +239,7 @@ function Esp:Upd()
     end
 
     if self.onSc then
+		self:updateSkel()
         local ch = self.charCache
         local kids = gc(self.char)
         if not ch[1] or self.childCnt ~= #kids then
@@ -441,8 +464,93 @@ function Esp:Ren()
 			l3.To = corn.corners[i == 4 and 8 or i+4]
 		end
 	end
-end
+	local skelEn = en and onSc and opt.skel
+	local skel = self.draw.skel
+	local gskel = self.draw.gskel
 
+	if skelEn and self.skpts then
+		local pts = self.skpts
+		
+		local function drwln(ln, p1, p2)
+			if p1 and p2 then
+				local s1, v1 = w2sc(p1)
+				local s2, v2 = w2sc(p2)
+				if v1 and v2 then
+					ln.From = s1
+					ln.To = s2
+					ln.Visible = true
+					ln.Color = parseC(self, opt.skelCol[1])
+					ln.Transparency = opt.skelCol[2]
+					return true
+				end
+			end
+			ln.Visible = false
+			return false
+		end
+		
+		drwln(skel.hd, pts.hd, pts.ur)
+		drwln(skel.nt, pts.ur, pts.lr)
+		drwln(skel.ls, pts.ur, pts.lua)
+		drwln(skel.rs, pts.ur, pts.rua)
+		drwln(skel.la, pts.lua, pts.lfa)
+		drwln(skel.ra, pts.rua, pts.rfa)
+		drwln(skel.ll, pts.lr, pts.lul)
+		drwln(skel.rl, pts.lr, pts.rul)
+		drwln(skel.bh, pts.lul, pts.lll)
+		
+		if opt.gskel then
+			drwln(gskel.hd, pts.hd, pts.ur)
+			drwln(gskel.nt, pts.ur, pts.lr)
+			drwln(gskel.ls, pts.ur, pts.lua)
+			drwln(gskel.rs, pts.ur, pts.rua)
+			drwln(gskel.la, pts.lua, pts.lfa)
+			drwln(gskel.ra, pts.rua, pts.rfa)
+			drwln(gskel.ll, pts.lr, pts.lul)
+			drwln(gskel.rl, pts.lr, pts.rul)
+			drwln(gskel.bh, pts.lul, pts.lll)
+			
+			for _, ln in pairs(gskel) do
+				if ln.Visible then
+					ln.Color = parseC(self, opt.gskelCol[1], true)
+					ln.Transparency = opt.gskelCol[2]
+				end
+			end
+		end
+	else
+		for _, ln in pairs(skel) do ln.Visible = false end
+		for _, ln in pairs(gskel) do ln.Visible = false end
+	end
+end
+function Esp:updateSkel()
+    if not self.char or not self.onSc then return end
+    local skpts = {}
+    
+    local hd = fc(self.char, "Head")
+    local ur = fc(self.char, "UpperTorso")
+    local lr = fc(self.char, "LowerTorso")
+    local lua = fc(self.char, "LeftUpperArm")
+    local rua = fc(self.char, "RightUpperArm")
+    local lfa = fc(self.char, "LeftLowerArm")
+    local rfa = fc(self.char, "RightLowerArm")
+    local lul = fc(self.char, "LeftUpperLeg")
+    local rul = fc(self.char, "RightUpperLeg")
+    local lll = fc(self.char, "LeftLowerLeg")
+    local rll = fc(self.char, "RightLowerLeg")
+    
+    if hd then skpts.hd = hd.CFrame.Position end
+    if ur then skpts.ur = ur.CFrame.Position end
+    if lr then skpts.lr = lr.CFrame.Position end
+    if lua then skpts.lua = lua.CFrame.Position end
+    if rua then skpts.rua = rua.CFrame.Position end
+    if lfa then skpts.lfa = lfa.CFrame.Position end
+    if rfa then skpts.rfa = rfa.CFrame.Position end
+    if lul then skpts.lul = lul.CFrame.Position end
+    if rul then skpts.rul = rul.CFrame.Position end
+    if lll then skpts.lll = lll.CFrame.Position end
+    if rll then skpts.rll = rll.CFrame.Position end
+    
+    self.skpts = skpts
+end
 local Cham = {}
 Cham.__index = Cham
 
@@ -593,6 +701,7 @@ local Itf = {
 			hlCol = Color3.new(0,1,0),
 			dyCol = Color3.new(1,0,0),
 			hbo = true,
+			
 			hboCol = { Color3.new(), 0.5 },
 			ht = false,
 			htCol = { Color3.new(1,1,1), 1 },
@@ -635,6 +744,10 @@ local Itf = {
 			chamsVisOnly = false,
 			chamsFCol = { Color3.new(0.2, 0.2, 0.2), 0.5 },
 			chamsOCol = { Color3.new(1,0,0), 0 },
+			skel = false,
+			skelCol = { Color3.new(1,1,1), 1 },
+			gskel = false,
+			gskelCol = { Color3.new(1,0,0), 0.5 },
 
 		},
 		fr = {
