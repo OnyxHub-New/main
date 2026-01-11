@@ -136,7 +136,8 @@ function Esp:init()
 			ra = self:_c("Line", { Thickness = 2, Visible = false }),
 			ll = self:_c("Line", { Thickness = 2, Visible = false }),
 			rl = self:_c("Line", { Thickness = 2, Visible = false }),
-			bh = self:_c("Line", { Thickness = 2, Visible = false })
+			bh = self:_c("Line", { Thickness = 2, Visible = false }),
+			rlb = self:_c("Line", { Thickness = 2, Visible = false })
 		},
 		gskel = {
 			hd = self:_c("Line", { Thickness = 3, Visible = false }),
@@ -147,7 +148,8 @@ function Esp:init()
 			ra = self:_c("Line", { Thickness = 3, Visible = false }),
 			ll = self:_c("Line", { Thickness = 3, Visible = false }),
 			rl = self:_c("Line", { Thickness = 3, Visible = false }),
-			bh = self:_c("Line", { Thickness = 3, Visible = false })
+			bh = self:_c("Line", { Thickness = 3, Visible = false }),
+			rlb = self:_c("Line", { Thickness = 3, Visible = false })
 		},
 		b3d = {
 			{ self:_c("Line", { Thickness = 1, Visible = false }),
@@ -487,7 +489,6 @@ function Esp:Ren()
 			ln.Visible = false
 			return false
 		end
-		
 		drwln(skel.hd, pts.hd, pts.ur)
 		drwln(skel.nt, pts.ur, pts.lr)
 		drwln(skel.ls, pts.ur, pts.lua)
@@ -497,6 +498,14 @@ function Esp:Ren()
 		drwln(skel.ll, pts.lr, pts.lul)
 		drwln(skel.rl, pts.lr, pts.rul)
 		drwln(skel.bh, pts.lul, pts.lll)
+		if not self.draw.skel.rlb then
+			self.draw.skel.rlb = self:_c("Line", { Thickness = 2, Visible = false })
+			self.draw.gskel.rlb = self:_c("Line", { Thickness = 3, Visible = false })
+			table.insert(self.bin, self.draw.skel.rlb)
+			table.insert(self.bin, self.draw.gskel.rlb)
+		end
+		
+		drwln(skel.rlb, pts.rul, pts.rll)
 		
 		if opt.gskel then
 			drwln(gskel.hd, pts.hd, pts.ur)
@@ -508,6 +517,7 @@ function Esp:Ren()
 			drwln(gskel.ll, pts.lr, pts.lul)
 			drwln(gskel.rl, pts.lr, pts.rul)
 			drwln(gskel.bh, pts.lul, pts.lll)
+			drwln(gskel.rlb, pts.rul, pts.rll)
 			
 			for _, ln in pairs(gskel) do
 				if ln.Visible then
