@@ -337,16 +337,12 @@ function Esp:Ren()
 		local fr = corn.tr + AB_OFF
 		local to = corn.br + AB_OFF
 		local maxArm = 200
-		local bh = (to.Y - fr.Y) * 0.8
-		local co = (to.Y - fr.Y) * 0.1 
-		to = Vector2.new(to.X, fr.Y + bh) - Vector2.new(0, co)
-		fr = fr + Vector2.new(0, co)
-		
+
 		local ab = v.ab
 		ab.To = to
 		ab.From = l2(to, fr, self.arm/maxArm)
 		ab.Color = opt.abCol[1]
-		
+
 		local abo = v.abo
 		abo.To = to + AO_OFF
 		abo.From = fr - AO_OFF
