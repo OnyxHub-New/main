@@ -37,8 +37,8 @@ local HT_OFF = Vector2.new(3, 0)
 local HO_OFF = Vector2.new(0, 1)
 local N_OFF = Vector2.new(0, 2)
 local D_OFF = Vector2.new(0, 2)
-local AB_OFF = Vector2.new(2, 0)
-local AT_OFF = Vector2.new(5, 0)
+local AB_OFF = Vector2.new(8, 0)
+local AT_OFF = Vector2.new(12, 0)
 local AO_OFF = Vector2.new(0, 1)
 local VERTS = {
 	Vector3.new(-1, -1, -1),
