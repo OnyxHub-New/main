@@ -3953,6 +3953,7 @@ function Airflow:Init(config)
 		FirstToggle = true;
 		UnlockMouse = config.UnlockMouse;
 		TabConfig = {};
+        
 	};
 
 	local AirflowWindow = Instance.new("ScreenGui")
@@ -5414,7 +5415,174 @@ do
 	UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	UIListLayout.Padding = UDim.new(0, 0)
-
+	function Airflow:CustomNotify(config)
+		config = config or {}
+		config.Title = config.Title or "Notification"
+		config.Content = config.Content or ""
+		config.Duration = config.Duration or 5
+	
+		local Notifier = Instance.new("ScreenGui")
+		Notifier.Parent = game:GetService("CoreGui")
+		Notifier.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	
+		local Frame = Instance.new("Frame")
+		local MainFrame = Instance.new("Frame")
+		local UICorner = Instance.new("UICorner")
+		local UIStroke = Instance.new("UIStroke")
+		local static = Instance.new("ImageLabel")
+		local Title = Instance.new("TextLabel")
+		local Content = Instance.new("TextLabel")
+	
+		Frame.Parent = Notifier
+		Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Frame.BackgroundTransparency = 1.000
+		Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Frame.BorderSizePixel = 0
+		Frame.Size = UDim2.new(0, 200, 0, 40)
+		Frame.AnchorPoint = Vector2.new(0.5, 0.5)
+		Frame.Position = NotifierPositions[c_notify.position]
+	
+		MainFrame.Name = airflow:RandomString()
+		MainFrame.Parent = Frame
+		MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+		MainFrame.BackgroundTransparency = 0.200
+		MainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		MainFrame.BorderSizePixel = 0
+		MainFrame.Size = UDim2.new(0, 200, 0, 40)
+		MainFrame.ZIndex = 121
+	
+		UICorner.CornerRadius = UDim.new(0, 4)
+		UICorner.Parent = MainFrame
+	
+		UIStroke.Transparency = 0.570
+		UIStroke.Color = Color3.fromRGB(66, 66, 66)
+		UIStroke.Parent = MainFrame
+	
+		static.Name = airflow:RandomString()
+		static.Parent = MainFrame
+		static.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		static.BackgroundTransparency = 1.000
+		static.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		static.BorderSizePixel = 0
+		static.Size = UDim2.new(1, 0, 1, 0)
+		static.ZIndex = 120
+		static.Image = "rbxassetid://9579075682"
+		static.ImageTransparency = 0.900
+		static.ScaleType = Enum.ScaleType.Crop
+	
+		Title.Name = airflow:RandomString()
+		Title.Parent = MainFrame
+		Title.AnchorPoint = Vector2.new(0.5, 0)
+		Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Title.BackgroundTransparency = 1.000
+		Title.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Title.BorderSizePixel = 0
+		Title.Position = UDim2.new(0.5, 0, 0, 5)
+		Title.Size = UDim2.new(1, -10, 0, 15)
+		Title.ZIndex = 123
+		Title.Font = Enum.Font.GothamMedium
+		Title.Text = config.Title
+		Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+		Title.TextSize = 14.000
+		Title.TextXAlignment = Enum.TextXAlignment.Left
+		Title.TextTransparency = 1
+	
+		task.delay(0.275, function()
+			airflow:CreateAnimation(Title, 0.4, nil, {
+				TextTransparency = 0
+			})
+		end)
+	
+		Content.Name = airflow:RandomString()
+		Content.Parent = MainFrame
+		Content.AnchorPoint = Vector2.new(0.5, 0)
+		Content.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Content.BackgroundTransparency = 1.000
+		Content.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Content.BorderSizePixel = 0
+		Content.Position = UDim2.new(0.5, 0, 0, 20)
+		Content.Size = UDim2.new(1, -10, 1, -20)
+		Content.ZIndex = 123
+		Content.Font = Enum.Font.GothamMedium
+		Content.Text = config.Content
+		Content.TextColor3 = Color3.fromRGB(255, 255, 255)
+		Content.TextSize = 12.000
+		Content.TextTransparency = 1
+		Content.TextXAlignment = Enum.TextXAlignment.Left
+		Content.TextYAlignment = Enum.TextYAlignment.Top
+		
+		task.delay(0.325, function()
+			airflow:CreateAnimation(Content, 0.5, nil, {
+				TextTransparency = 0.3
+			})
+		end)
+	
+		local UpdateScale = function()
+			local TitleScale = game:GetService("TextService"):GetTextSize(Title.Text, Title.TextSize, Title.Font, Vector2.new(math.huge, math.huge))
+	
+			if Content.Text == "" then
+				airflow:CreateAnimation(Frame, 0.2, nil, {
+					Size = UDim2.fromOffset(TitleScale.X + 5, 45)
+				})
+	
+				airflow:CreateAnimation(MainFrame, 0.2, nil, {
+					Size = UDim2.fromOffset(TitleScale.X + 5, 40)
+				})
+			else
+				local ContentScale = game:GetService("TextService"):GetTextSize(Content.Text, Content.TextSize, Content.Font, Vector2.new(math.huge, math.huge))
+	
+				local Long = ((ContentScale.X > TitleScale.X) and ContentScale.X) or TitleScale.X
+	
+				airflow:CreateAnimation(Frame, 0.2, nil, {
+					Size = UDim2.fromOffset(Long + 10, ContentScale.Y + 30)
+				})
+	
+				airflow:CreateAnimation(MainFrame, 0.2, nil, {
+					Size = UDim2.fromOffset(Long + 10, ContentScale.Y + 25)
+				})
+			end
+		end
+	
+		UpdateScale()
+	
+		MainFrame.Position = UDim2.fromScale(0, 0)
+	
+		if typeof(config.Duration) == 'boolean' then
+			return {
+				Close = function()
+					airflow:CreateAnimation(MainFrame, 0.4, nil, {
+						Position = UDim2.new(1.5, 100, 0, 0)
+					}).Completed:Connect(function()
+						airflow:CreateAnimation(Frame, 0.4, nil, {
+							Size = UDim2.fromScale(0, 0)
+						}).Completed:Connect(function()
+							Notifier:Destroy()
+						end)
+					end)
+				end,
+				SetText = function(self, i)
+					Title.Text = i
+					UpdateScale()
+				end,
+				SetContent = function(self, i)
+					Content.Text = i
+					UpdateScale()
+				end,
+			}
+		else
+			task.delay(config.Duration, function()
+				airflow:CreateAnimation(MainFrame, 0.4, nil, {
+					Position = UDim2.new(1.5, 100, 0, 0)
+				}).Completed:Connect(function()
+					airflow:CreateAnimation(Frame, 0.4, nil, {
+						Size = UDim2.fromScale(0, 0)
+					}).Completed:Connect(function()
+						Notifier:Destroy()
+					end)
+				end)
+			end)
+		end
+	end
 	function Airflow:Notify(config)
 		config = config or {};
 		config.Title = config.Title or "Notification";
